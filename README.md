@@ -1,6 +1,6 @@
 # Splunk-Tail
 
-A desktop application that enables tail (automatically refreshed) and search in multiple tabs.
+A desktop application that enables tail (automatically refreshed) and search in multiple tabs for Splunk.
 
 Tecnology:
 - Electron (cross compatible desktop framework with senf-contained nodejs)
