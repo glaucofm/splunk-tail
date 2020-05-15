@@ -1,0 +1,68 @@
+{
+  "name": "splunk-tail",
+  "version": "1.0.6",
+  "main": "dist/main.js",
+  "description": "",
+  "scripts": {
+    "build": "tsc",
+    "postbuild": "xcopy \".\\src\\assets\" \".\\dist\\assets\\\" /c /q /s /e /r /y && xcopy \".\\src\\web\" \".\\dist\\web\\\" /c /q /s /e /r /y",
+    "watch": "tsc -w",
+    "lint": "tslint -c tslint.json -p tsconfig.json",
+    "start": "npm run build && electron ./dist/main.js",
+    "electron-build": "ng build && electron .",
+    "dist": "electron-builder --win",
+    "dist-mac": "electron-builder --mac",
+    "dist-linux": "electron-builder --linux"
+  },
+  "author": "",
+  "license": "",
+  "devDependencies": {
+    "electron": "^6.0.8",
+    "electron-builder": "^22.3.2",
+    "tslint": "^5.19.0",
+    "typescript": "^3.6.0"
+  },
+  "dependencies": {
+    "@types/jquery": "^3.3.31",
+    "electron-find": "^1.0.6",
+    "electron-reload": "^1.5.0",
+    "moment": "^2.24.0",
+    "node-fetch": "^2.6.0",
+    "uuid": "^3.4.0",
+    "xml2js": "^0.4.23"
+  },
+  "build": {
+    "appId": "com.gmsoft.splunk.tail",
+    "files": [
+      "dist/assets/**/*",
+      "dist/web/**/*",
+      "dist/**/*.js",
+      "!node_modules",
+      "node_modules/moment",
+      "node_modules/node-fetch",
+      "node_modules/sax",
+      "node_modules/uuid",
+      "node_modules/xml2js",
+      "node_modules/xmlbuilder"
+    ],
+    "win": {
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "icon.ico",
+      "artifactName": "splunk-tail_setup_${version}.${ext}"
+    },
+    "nsis": {
+      "oneClick": true,
+      "runAfterFinish": true,
+      "installerIcon": "icon.ico",
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": false
+    }
+  }
+}

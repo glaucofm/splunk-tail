@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Splunk Tail</title>
+    <link href="../assets/css/fontawesome-all.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/purecss@1.0.1/build/pure-min.css" integrity="sha384-oAOxQR6DkCoMliIh8yFnu25d7Eq/PHS21PClpwjOTeU2jRSq11vu66rf90/cZr47" crossorigin="anonymous">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <link href="../assets/css/splunktail.css" type="text/css" rel="stylesheet">
+    <script src="../renderer.js"></script>
+</head>
+<body>
+
+    <div class="pure-menu pure-menu-horizontal main-menu">
+        <ul class="pure-menu-list">
+
+            <li class="pure-menu-item">
+                <div class="dropdown hover" id="menu-splunk">
+                    <a class="pure-menu-link clickable splunk">
+                        <i class="fas fa-server"></i>
+                        Splunk Envs
+                    </a>
+                    <div class="dropdown-content dropdown-connections">
+                        <table>
+                            <tr class="action">
+                                <td>
+                                    <a><i class="fas fa-plus"></i> Add Splunk env</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </li>
+
+            <li class="pure-menu-item">
+                <div class="dropdown hover" id="menu-tail">
+                    <a class="pure-menu-link clickable tail">
+                        <i class="fas fa-scroll"></i>
+                        Tail
+                    </a>
+                    <div class="dropdown-content dropdown-tails">
+                        <table>
+                            <tr class="action">
+                                <td>
+                                    <a><i class="fas fa-plus"></i> Add tail</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </li>
+
+            <li class="pure-menu-item search">
+                <a class="pure-menu-link">
+                    <i class="fas fa-search"></i> Search
+                </a>
+                <div>
+                    <textarea id="generalSearch" name="generalSearch" type="text" placeholder="Type query and press enter to search or shift+enter to add a line"></textarea>
+                    <select id="searchTime" name="searchTime" class="time">
+                        <option value="-1h">Last 1 hour</option>
+                        <option value="-4h">Last 4 hours</option>
+                        <option value="-1d">Last 1 day</option>
+                        <option value="-3d">Last 3 days</option>
+                        <option value="-7d">Last 7 days</option>
+                        <option value="-30d">Last 30 days</option>
+                    </select>
+                    <select id="searchSplunkEnvs" name="searchSplunkEnv" class="env">
+                    </select>
+                    <a class="open"><i class="far fa-folder-open"></i></a>
+                    <a class="save"><i class="far fa-save"></i></a>
+                </div>
+            </li>
+        </ul>
+    </div>
+
+    <div class="logs-tabs-head">
+        <table>
+            <tr>
+                <td class="filler" style="display: none"></td>
+            </tr>
+        </table>
+    </div>
+    <div class="logs-tabs-body">
+    </div>
+
+    <div id="edit-splunk-env" class="modal" style="display: none">
+        <div class="modal-content" style="margin:10px; width:600px">
+            <div class="modal-title">
+                Edit Splunk env
+            </div>
+            <div class="modal-body">
+                <form class="pure-form pure-form-stacked">
+                    <fieldset>
+                        <input type="hidden" name="id">
+                        <label for="name">Name for this splunk env</label>
+                        <input id="name" name="name" type="text" class="pure-input-1" placeholder="Name for this connection">
+                        <label for="apiUrl">API URL</label>
+                        <input id="apiUrl" name="apiUrl" type="text" class="pure-input-1" placeholder="https://<host>:443/<group>/{username}/<application>/search/jobs/export">
+                        <label for="username">Splunk user name</label>
+                        <input id="username" name="username" type="text" class="pure-input-1" placeholder="Splunk user name">
+                        <label for="password">Splunk password</label>
+                        <input id="password" type="password" name="password" type="text" class="pure-input-1" placeholder="Password">
+                        <button type="button" class="pure-button pure-button-primary save">
+                            <i class="far fa-save"></i>
+                            Save
+                        </button>
+                        <button type="button" class="pure-button cancel">
+                            <i class="far fa-window-close"></i>
+                            Cancel
+                        </button>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+
+    <div id="edit-tail" class="modal" style="display: none">
+        <div class="modal-content" style="margin-left:100px; width:600px">
+            <div class="modal-title">
+                Edit Tail
+            </div>
+            <div class="modal-body">
+                <form class="pure-form pure-form-stacked">
+                    <fieldset>
+                        <input type="hidden" name="id">
+                        <label for="splunkEnv">Splunk environment</label>
+                        <select id="splunkEnv" name="splunkEnv">
+                            <!--<option value=""></option>-->
+                        </select>
+                        <label for="search">Main search criteria</label>
+                        <input id="search" name="search" type="text" class="pure-input-1" placeholder="Search criteria">
+                        <label for="additionalSearch">Additional search criteria</label>
+                        <input id="additionalSearch" name="additionalSearch" type="text" class="pure-input-1" placeholder="">
+                        <label for="exclusions">Exclusions</label>
+                        <input id="exclusions" name="exclusions" type="text" class="pure-input-1" placeholder="Eg.: message=mtdSLA message=duplicateQuery">
+                        <button type="button" class="pure-button pure-button-primary save">
+                            <i class="far fa-save"></i>
+                            Save
+                        </button>
+                        <button type="button" class="pure-button cancel">
+                            <i class="far fa-window-close"></i>
+                            Cancel
+                        </button>
+                        <button type="button" class="pure-button pure-button-warning delete">
+                            <i class="far fa-trash-alt"></i>
+                            Delete
+                        </button>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal save-query" style="display: none">
+        <div class="modal-content" style="width:800px">
+            <div class="modal-title">
+                Save search query
+            </div>
+            <div class="modal-body">
+                <form class="pure-form pure-form-stacked">
+                    <fieldset>
+                        <label for="alias">Alias</label>
+                        <input id="alias" name="alias" type="text" class="pure-input-1" placeholder="Give it an alias for easier recovery later">
+                        <label for="expression">Query</label>
+                        <textarea id="expression" name="expression" class="pure-input-1"></textarea>
+                        <button type="button" class="pure-button pure-button-primary save">
+                            <i class="far fa-save"></i>
+                            Save
+                        </button>
+                        <button type="button" class="pure-button cancel">
+                            <i class="far fa-window-close"></i>
+                            Cancel
+                        </button>
+                        <button type="button" class="pure-button pure-button-warning delete">
+                            <i class="far fa-trash-alt"></i>
+                            Delete
+                        </button>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+
+    <div class="modal open-query" style="display: none">
+        <div class="modal-content" style="width:960px">
+            <div class="modal-title">
+                Open saved search query
+            </div>
+            <div class="modal-body">
+                <ul></ul>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+
+    <select id="tempSelect">
+        <option id="tempOption"></option>
+    </select>
+
+</body>
+</html>
